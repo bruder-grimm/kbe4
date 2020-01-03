@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://java.sun.com/xml/ns/persistence" version="2.0">
+
+    <persistence-unit name="songdb" transaction-type="RESOURCE_LOCAL">
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+        <class>htwb.ai.mundt.song.Song</class>
+        <class>htwb.ai.mundt.user.User</class>
+        <exclude-unlisted-classes>true</exclude-unlisted-classes>
+
+        <properties>
+            <property name="javax.persistence.jdbc.user" value="cttnlsmc"/>
+            <property name="javax.persistence.jdbc.password" value="XklyWwk0HEY0VHlVpAsbk_0S8MxWCT4Z"/>
+            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://balarama.db.elephantsql.com:5432/cttnlsmc"/>
+            <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver"/>
+
+            <!--Hibernate properties-->
+            <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQL95Dialect"/>
+            <property name="hibernate.format_sql" value="false"/>
+            <property name="hibernate.show_sql" value="false"/>
+
+            <!-- The connection is released after each statement execution 
+                 and reacquired prior to running the next statement.  -->
+            <property name="hibernate.connection.release_mode" value="after_statement" />
+            
+            <!-- Connection pool properties -->
+            <property name="hibernate.c3p0.min_size" value="1"/>
+            <!-- This is limited to 3 because the htw db only allows 10 concurrent connections -->
+            <property name="hibernate.c3p0.max_size" value="3"/>
+            
+            <!-- in seconds:  When an idle connection is removed from the pool
+                 Hibernate default: 0, never expire. -->
+            <property name="hibernate.c3p0.timeout" value="5"/>
+            
+            <!--  Number of prepared statements that will be cached. 
+                  Hibernate default: 0 , caching is disable. -->
+            <property name="hibernate.c3p0.max_statements" value="10"/>
+        </properties>
+    </persistence-unit>
+</persistence>

@@ -2,6 +2,7 @@ package htwb.ai.mundt.config;
 
 import htwb.ai.mundt.filter.Authenticator;
 import htwb.ai.mundt.filter.IAuthenticator;
+import htwb.ai.mundt.playlist.*;
 import htwb.ai.mundt.song.ISongRepository;
 import htwb.ai.mundt.song.ISongService;
 import htwb.ai.mundt.song.SongRepository;
@@ -21,14 +22,20 @@ public class DependencyBinder extends AbstractBinder {
 
         SongRepository sr = new SongRepository(emf);
         UserRepository ur = new UserRepository(emf);
+        PlayListRepository pr = new PlayListRepository(emf);
 
         bind(sr).to(ISongRepository.class);
         bind(ur).to(IUserRepository.class);
+        bind(pr).to(IPlayListRepository.class);
 
         UserService us = new UserService(ur);
+        SongService ss = new SongService(sr);
 
-        bind(new SongService(sr)).to(ISongService.class);
+        PlayListService pls = new PlayListService(pr);
+
+        bind(ss).to(ISongService.class);
         bind(us).to(IUserService.class);
+        bind(pls).to(IPlayListService.class);
 
         bind(new Authenticator(us)).to(IAuthenticator.class);
     }

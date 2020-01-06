@@ -1,9 +1,9 @@
 package htwb.ai.mundt.filter;
 
+import htwb.ai.mundt.user.User;
 import org.brudergrimm.jmonad.option.Option;
 
 import javax.inject.Inject;
-import javax.ws.rs.OPTIONS;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.Response;
@@ -51,10 +51,18 @@ public class AuthorizationFilter implements ContainerRequestFilter {
                     requestPath));
             abort(requestContext);
         }
+
+        Option<User> authenticatedUser = authenticator.getAuthenticatedUser(possibleToken.get());
+
+        // relatively certain this is not going to happen but making sure never killed anyone
+        if (authenticatedUser.isEmpty()) abort(requestContext);
+
+        // we could set a SecurityContext here and access the UserPrincipal from within the controller methods
+        // but since I just don't care enough setting a property will do
+        requestContext.setProperty("authenticatedUser", authenticatedUser.get());
     }
 
-    private void abort(ContainerRequestContext ctx) {
-        // this can be commented out for testing
-        ctx.abortWith(Response.status(UNAUTHORIZED).build());
+    private void abort(ContainerRequestContext requestContext) {
+        requestContext.abortWith(Response.status(UNAUTHORIZED).build());
     }
 }

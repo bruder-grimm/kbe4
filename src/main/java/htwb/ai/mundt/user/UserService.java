@@ -9,17 +9,21 @@ import java.util.Base64;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class UserService extends CRUD<String, User> implements IUserService {
-    private final Map<Integer, String> issuedKeys = new ConcurrentHashMap<>();
-    private final Function<Integer, String> keygen;
+
+    // we need to achieve bidirectional mapping because iterating over a map KILLS performance
+    private final Map<String, User> authorizedKeyToUser = new ConcurrentHashMap<>();
+    private final Map<User, String> authorizedUserToKey = new ConcurrentHashMap<>();
+
+    private final Supplier<String> keygen;
 
     @Inject
     public UserService(IUserRepository repository) {
         super(repository);
 
-        this.keygen = (Integer ignored) -> {
+        this.keygen = () -> {
             byte[] bytes = new byte[64];
             ThreadLocalRandom.current().nextBytes(bytes);
 
@@ -29,7 +33,7 @@ public class UserService extends CRUD<String, User> implements IUserService {
         };
     }
 
-    protected UserService(Repository<String, User> repository, Function<Integer, String> keygen) {
+    protected UserService(Repository<String, User> repository, Supplier<String> keygen) {
         super(repository);
         this.keygen = keygen;
     }
@@ -40,10 +44,27 @@ public class UserService extends CRUD<String, User> implements IUserService {
     }
 
     public String getAuthorizationKeyFor(User user) {
-        return issuedKeys.computeIfAbsent(user.hashCode(), keygen);
+        String token;
+        if (!authorizedUserToKey.containsKey(user)) {
+            token = keygen.get();
+            addToIssedKeys(user, token);
+        } else {
+            token = authorizedUserToKey.get(user);
+        }
+
+        return token;
     }
 
     public boolean isAuthorized(String token) {
-        return issuedKeys.containsValue(token);
+        return authorizedKeyToUser.containsKey(token);
+    }
+
+    public Option<User> getUserFor(String token) {
+        return Option.apply(authorizedKeyToUser.get(token));
+    }
+
+    private void addToIssedKeys(User user, String key) {
+        this.authorizedUserToKey.put(user, key);
+        this.authorizedKeyToUser.put(key, user);
     }
 }

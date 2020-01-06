@@ -7,4 +7,5 @@ public interface IUserService extends ICRUD<String, User> {
     Option<User> getUserWith(String id, String key);
     String getAuthorizationKeyFor(User user);
     boolean isAuthorized(String token);
+    Option<User> getUserFor(String token);
 }

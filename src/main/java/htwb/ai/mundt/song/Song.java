@@ -1,12 +1,12 @@
 package htwb.ai.mundt.song;
 
+import htwb.ai.mundt.playlist.PlayList;
 import htwb.ai.mundt.storage.Identifiable;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.xml.bind.annotation.XmlRootElement;
+
+import java.util.List;
 
 import static javax.persistence.GenerationType.IDENTITY;
 
@@ -22,6 +22,9 @@ public class Song implements Identifiable<Integer> {
     private String artist;
     private String label;
     private int released;
+
+    @ManyToMany(mappedBy = "songs")
+    private List<PlayList> playLists;
 
     public Song() {}
 
@@ -66,6 +69,14 @@ public class Song implements Identifiable<Integer> {
         this.released = released;
     }
 
+    public List<PlayList> getPlayLists() {
+        return playLists;
+    }
+
+    public void setPlayLists(List<PlayList> playLists) {
+        this.playLists = playLists;
+    }
+
     @Override public String toString() {
         return String.format("Song(%s, %s, %s, %s, %s)", id, title, artist, label, released);
     }
@@ -77,7 +88,7 @@ public class Song implements Identifiable<Integer> {
         Song other = (Song) o;
 
         return
-                id == other.id &&
+                id.equals(other.id) &&
                 released == other.released &&
                 title.equals(other.title) &&
                 artist.equals(other.artist) &&

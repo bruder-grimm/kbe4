@@ -5,12 +5,13 @@
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         <class>htwb.ai.mundt.song.Song</class>
         <class>htwb.ai.mundt.user.User</class>
+        <class>htwb.ai.mundt.playlist.PlayList</class>
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
 
         <properties>
-            <property name="javax.persistence.jdbc.user" value="cttnlsmc"/>
-            <property name="javax.persistence.jdbc.password" value="XklyWwk0HEY0VHlVpAsbk_0S8MxWCT4Z"/>
-            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://balarama.db.elephantsql.com:5432/cttnlsmc"/>
+            <property name="javax.persistence.jdbc.user" value=""/>
+            <property name="javax.persistence.jdbc.password" value=""/>
+            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/_s0549272__songdb"/>
             <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver"/>
 
             <!--Hibernate properties-->

@@ -182,11 +182,12 @@ public abstract class Repository<Key, Value extends Identifiable<Key>> implement
     public static <T> T initializeAndUnproxy(final T entity) {
         Hibernate.initialize(entity);
         if (entity instanceof HibernateProxy) {
-            logger.info(String.format("Unpoxieing instance of type '%s'", entity.getClass().getName()));
+            logger.info(String.format("Unproxieing instance of type '%s'", entity.getClass().getName()));
             @SuppressWarnings("unchecked")
             T resolved = (T) ((HibernateProxy) entity)
                     .getHibernateLazyInitializer()
                     .getImplementation();
+            logger.info(String.format("Got entity of class '%s'", resolved.getClass().getName()));
             return resolved;
         }
         return entity;

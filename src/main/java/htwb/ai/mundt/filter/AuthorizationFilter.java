@@ -38,6 +38,7 @@ public class AuthorizationFilter implements ContainerRequestFilter {
         String requestPath = requestContext.getUriInfo().getPath();
 
         if (possibleToken.isEmpty()) {
+
             List<String> parts = Arrays.asList(requestPath.split("/"));
 
             if (!parts.contains("auth")) {
@@ -45,21 +46,23 @@ public class AuthorizationFilter implements ContainerRequestFilter {
                 abort(requestContext);
             }
         } else if (!isAuthenticated) {
+
             logger.info(String.format(
                     "Wasn't able to authenticate token '%s', denying request to %s",
                     possibleToken.get(),
                     requestPath));
             abort(requestContext);
+        } else {
+
+            Option<User> authenticatedUser = authenticator.getAuthenticatedUser(possibleToken.get());
+
+            // relatively certain this is not going to happen but making sure never killed anyone
+            if (authenticatedUser.isEmpty()) abort(requestContext);
+
+            // we could set a SecurityContext here and access the UserPrincipal from within the controller methods
+            // but since I just don't care enough setting a property will do
+            requestContext.setProperty("authenticatedUser", authenticatedUser.get());
         }
-
-        Option<User> authenticatedUser = authenticator.getAuthenticatedUser(possibleToken.get());
-
-        // relatively certain this is not going to happen but making sure never killed anyone
-        if (authenticatedUser.isEmpty()) abort(requestContext);
-
-        // we could set a SecurityContext here and access the UserPrincipal from within the controller methods
-        // but since I just don't care enough setting a property will do
-        requestContext.setProperty("authenticatedUser", authenticatedUser.get());
     }
 
     private void abort(ContainerRequestContext requestContext) {

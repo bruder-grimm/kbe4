@@ -34,9 +34,9 @@ public class UserController extends RestController {
                 })
                 .orElseGet(() -> {
                         logInfo(String.format("Recieved invalid get for userId: '%s', key: '%s'. Returning 401", userId, key));
+
                         return Response.status(UNAUTHORIZED);
                 })
         .build();
-
     }
 }

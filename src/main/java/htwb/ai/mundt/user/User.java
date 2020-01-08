@@ -15,7 +15,10 @@ public class User implements Identifiable<String> {
     private String firstname;
     private String lastname;
 
-    @Override public String getId() {
+    public User() {}
+
+    @Override
+    public String getId() {
         return this.userid;
     }
 

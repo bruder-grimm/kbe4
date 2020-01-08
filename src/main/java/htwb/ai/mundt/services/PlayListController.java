@@ -1,7 +1,6 @@
 package htwb.ai.mundt.services;
 
 import htwb.ai.mundt.playlist.PlayList;
-import htwb.ai.mundt.playlist.PlayListForm;
 import htwb.ai.mundt.playlist.PlayListService;
 import htwb.ai.mundt.song.Song;
 import htwb.ai.mundt.song.SongService;
@@ -12,10 +11,7 @@ import org.brudergrimm.jmonad.option.Option;
 import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -55,7 +51,9 @@ public class PlayListController extends RestController {
                             )
                             .collect(Collectors.toList());
 
-                    return Response.ok(filtered);
+                    logInfo(String.format("Found Playlists: %s", filtered));
+
+                    return Response.ok(new GenericEntity<>(filtered) {});
                 })
                 .orElseGet(() -> {
                     logInfo(String.format("Didn't find user with id '%s', returning 404", userId));
@@ -73,7 +71,7 @@ public class PlayListController extends RestController {
                 .map(playList -> {
                     logInfo(String.format("Found %s", playList));
 
-                    User authenticatedUser = (User) context.getProperty("authenticatedUser");
+                    User authenticatedUser = getUserFromContext(context);
                     if (playList.isVisible() || playList.getOwner().equals(authenticatedUser)) {
                         return Response.ok(playList);
                     } else return Response.status(FORBIDDEN);
@@ -87,9 +85,9 @@ public class PlayListController extends RestController {
 
     @POST
     @Consumes({APPLICATION_JSON, APPLICATION_XML})
-    public Response postPlayList(PlayListForm playListForm, @Context ContainerRequestContext context, @Context UriInfo uriInfo) {
-        List<Option<Song>> possibleSongs = playListForm.getSongs().stream()
-                .map(songService::read)
+    public Response postPlayList(PlayList playlist, @Context ContainerRequestContext context, @Context UriInfo uriInfo) {
+        List<Option<Song>> possibleSongs = playlist.getSongs().stream()
+                .map(song -> songService.read(song.getId()))
                 .collect(Collectors.toList());
 
         boolean anySongDoesntExist = possibleSongs.stream().anyMatch(Option::isEmpty);
@@ -102,22 +100,28 @@ public class PlayListController extends RestController {
 
         User authenticatedUser = (User) context.getProperty("authenticatedUser");
 
-        PlayList playList = new PlayList();
-        playList.setName(playListForm.getName());
-        playList.setOwner(authenticatedUser);
-        playList.setSongs(songs);
-        playList.setVisible(playListForm.isVisible());
+        playlist.setOwner(authenticatedUser);
+        playlist.setSongs(songs);
 
-        return playListService.create(playList)
-                .map(id ->{
+        return playListService.create(playlist)
+                .map(id -> {
                     UriBuilder uriBuilder = uriInfo.getAbsolutePathBuilder();
                     uriBuilder.path(Integer.toString(id));
                     return Response.created(uriBuilder.build());
                 })
                 .orElseGet(() -> {
-                    logInfo("Couldn't create Song");
+                    logInfo("Couldn't create PlayList");
                     return Response.notAcceptable(null);
                 })
                 .build();
+    }
+
+    private static User getUserFromContext(ContainerRequestContext context) {
+        User authenticatedUser = (User) context.getProperty("authenticatedUser");
+        if (authenticatedUser == null) { // this is never going to happen
+            throw new RuntimeException("Entered protected route without authentication");
+        }
+
+        return authenticatedUser;
     }
 }

@@ -5,15 +5,16 @@ import org.brudergrimm.jmonad.tried.Try;
 import org.hibernate.Hibernate;
 import org.hibernate.proxy.HibernateProxy;
 
-import javax.persistence.*;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
+import javax.persistence.PersistenceException;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /** @param <Value>> The Type of the DAO
@@ -36,11 +37,9 @@ public abstract class Repository<Key, Value extends Identifiable<Key>> implement
             CriteriaBuilder cb = session.getCriteriaBuilder();
 
             CriteriaQuery<Value> cq = cb.createQuery(type);
-            Root<Value> rootEntry = cq.from(type);
-            CriteriaQuery<Value> all = cq.select(rootEntry);
-            TypedQuery<Value> allQuery = session.createQuery(all);
+            CriteriaQuery<Value> all = cq.select(cq.from(type));
 
-            return allQuery.getResultList();
+            return session.createQuery(all).getResultList();
         }).getOrElse(List.of());
     }
 
@@ -138,10 +137,13 @@ public abstract class Repository<Key, Value extends Identifiable<Key>> implement
     private <A> Try<A> withSessionDo(Function<EntityManager, A> query) {
         int connectionId = ThreadLocalRandom.current().nextInt(1, 10);
         logger.info(String.format("Opening connection (%s)...", connectionId));
+
         return Try.apply(emf::createEntityManager)
                 .flatMap(session -> {
-                    Try<A> result = Try.apply(() ->query.apply(session));
+
+                    Try<A> result = Try.apply(() -> query.apply(session));
                     session.close();
+
                     logger.info(String.format("Connection (%s) closed", connectionId));
                     return result;
                 });
@@ -153,6 +155,7 @@ public abstract class Repository<Key, Value extends Identifiable<Key>> implement
      *  @param action The thing you want to have managed or detached or whatever really I don't even care anymore */
     private static <A> A applyInTransaction(EntityManager em, Function<EntityManager, A> action) throws IllegalStateException {
         EntityTransaction transaction = em.getTransaction();
+
         transaction.begin();
         A result = action.apply(em);
         transaction.commit();
@@ -181,6 +184,7 @@ public abstract class Repository<Key, Value extends Identifiable<Key>> implement
      *  @return unproxied entity */
     public static <T> T initializeAndUnproxy(final T entity) {
         Hibernate.initialize(entity);
+
         if (entity instanceof HibernateProxy) {
             logger.info(String.format("Unproxieing instance of type '%s'", entity.getClass().getName()));
             @SuppressWarnings("unchecked")
@@ -188,6 +192,7 @@ public abstract class Repository<Key, Value extends Identifiable<Key>> implement
                     .getHibernateLazyInitializer()
                     .getImplementation();
             logger.info(String.format("Got entity of class '%s'", resolved.getClass().getName()));
+
             return resolved;
         }
         return entity;

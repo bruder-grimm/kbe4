@@ -24,10 +24,10 @@ public class Song implements Identifiable<Integer> {
     private String label;
     private int released;
 
+
     public Song() {}
 
-    @Override
-    public Integer getId() {
+    @Override public Integer getId() {
         return id;
     }
 

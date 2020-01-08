@@ -98,7 +98,7 @@ public class PlayListController extends RestController {
                 .map(Option::get)
                 .collect(Collectors.toList());
 
-        User authenticatedUser = (User) context.getProperty("authenticatedUser");
+        User authenticatedUser = getUserFromContext(context);
 
         playlist.setOwner(authenticatedUser);
         playlist.setSongs(songs);
@@ -116,12 +116,13 @@ public class PlayListController extends RestController {
                 .build();
     }
 
-    private static User getUserFromContext(ContainerRequestContext context) {
-        User authenticatedUser = (User) context.getProperty("authenticatedUser");
-        if (authenticatedUser == null) { // this is never going to happen
-            throw new RuntimeException("Entered protected route without authentication");
-        }
+    @DELETE
+    public Response deleteStub() {
+        return Response.status(METHOD_NOT_ALLOWED).build();
+    }
 
-        return authenticatedUser;
+    @PUT
+    public Response putStub() {
+        return Response.status(METHOD_NOT_ALLOWED).build();
     }
 }

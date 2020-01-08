@@ -1,5 +1,7 @@
-package htwb.ai.mundt.api;
+package htwb.ai.mundt.api.config;
 
+import htwb.ai.mundt.api.database.InMemorySongRepository;
+import htwb.ai.mundt.api.database.InMemoryUserRepository;
 import htwb.ai.mundt.filter.Authenticator;
 import htwb.ai.mundt.filter.IAuthenticator;
 import htwb.ai.mundt.song.ISongRepository;
@@ -10,11 +12,11 @@ import htwb.ai.mundt.user.IUserService;
 import htwb.ai.mundt.user.UserService;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 
-public class TestDependencyBinder extends AbstractBinder {
+public class MockDependencyBinder extends AbstractBinder {
     @Override
     protected void configure() {
-        SongTestRepository str = new SongTestRepository();
-        UserTestRepository utr = new UserTestRepository();
+        InMemorySongRepository str = new InMemorySongRepository();
+        InMemoryUserRepository utr = new InMemoryUserRepository();
 
         bind(str).to(ISongRepository.class);
         bind(utr).to(IUserRepository.class);

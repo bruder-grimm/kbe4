@@ -1,4 +1,4 @@
-package htwb.ai.mundt.api;
+package htwb.ai.mundt.api.database;
 
 import htwb.ai.mundt.song.ISongRepository;
 import htwb.ai.mundt.song.Song;
@@ -6,18 +6,20 @@ import org.brudergrimm.jmonad.option.Option;
 import org.brudergrimm.jmonad.tried.Success;
 import org.brudergrimm.jmonad.tried.Try;
 
-import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class SongTestRepository implements ISongRepository {
-    private static Map<Integer, Song> storage;
+public class InMemorySongRepository implements ISongRepository {
+    private Map<Integer, Song> storage;
 
-    public SongTestRepository() {
-        storage = new ConcurrentHashMap<Integer,Song>();
+    public InMemorySongRepository() {
+        storage = new ConcurrentHashMap<>();
         initSomeContacts();
     }
-    private static void initSomeContacts() {
+    private void initSomeContacts() {
         Song song1 = new Song();
         song1.setId(1);
         song1.setTitle("MacArthur Park");
@@ -118,7 +120,7 @@ public class SongTestRepository implements ISongRepository {
 
     @Override
     public boolean update(Song entity) {
-        if(storage.containsKey(entity.getId())){
+        if(storage.containsKey(entity.getId())) {
             storage.put(entity.getId(),entity);
             return true;
         }
@@ -127,15 +129,13 @@ public class SongTestRepository implements ISongRepository {
 
     @Override
     public boolean delete(Integer id) {
-        if(storage.containsKey(id)){
+        if(storage.containsKey(id)) {
             storage.remove(id);
             return true;
-        };
+        }
         return false;
     }
 
     @Override
-    public void close() throws IOException {
-
-    }
+    public void close() { }
 }

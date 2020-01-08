@@ -5,7 +5,7 @@ DROP TABLE IF EXISTS song_playlist CASCADE;
 
 CREATE TABLE users(
     userId VARCHAR(50) NOT NULL PRIMARY KEY,
-    key VARCHAR(50) NOT NULL ,
+    key VARCHAR(50) NOT NULL,
     firstName VARCHAR(50) NOT NULL,
     lastName VARCHAR(50) NOT NULL
 );

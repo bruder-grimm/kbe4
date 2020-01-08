@@ -1,25 +1,21 @@
-package htwb.ai.mundt.api;
+package htwb.ai.mundt.api.database;
 
 import htwb.ai.mundt.user.IUserRepository;
-import htwb.ai.mundt.user.IUserService;
 import htwb.ai.mundt.user.User;
 import org.brudergrimm.jmonad.option.Option;
 import org.brudergrimm.jmonad.tried.Success;
 import org.brudergrimm.jmonad.tried.Try;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
-public class UserTestRepository implements IUserRepository {
+public class InMemoryUserRepository implements IUserRepository {
     private static Map<String, User> storage;
 
-    public UserTestRepository() {
-        storage = new ConcurrentHashMap<String,User>();
+    public InMemoryUserRepository() {
+        storage = new ConcurrentHashMap<>();
         initSomeContacts();
     }
     private static void initSomeContacts() {
@@ -78,7 +74,5 @@ public class UserTestRepository implements IUserRepository {
     }
 
     @Override
-    public void close() throws IOException {
-
-    }
+    public void close() { }
 }

@@ -1,13 +1,13 @@
 package htwb.ai.mundt.playlist;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import htwb.ai.mundt.song.Song;
 import htwb.ai.mundt.storage.Identifiable;
 import htwb.ai.mundt.user.User;
 
 import javax.persistence.*;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.*;
 import java.util.List;
 
 import static javax.persistence.GenerationType.IDENTITY;
@@ -15,14 +15,20 @@ import static javax.persistence.GenerationType.IDENTITY;
 @Entity
 @Table(name = "playlists")
 @XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class PlayList implements Identifiable<Integer> {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Integer id;
     private String name;
+
+    @JsonProperty("isPrivate")
+    @XmlAttribute(name="isPrivate")
     private boolean visible;
 
+    @JsonIgnore
+    @XmlTransient
     @ManyToOne
     @JoinColumn(name = "owner_id", referencedColumnName = "userId")
     private User owner;
@@ -52,8 +58,6 @@ public class PlayList implements Identifiable<Integer> {
         this.name = name;
     }
 
-    @JsonIgnore
-    @XmlTransient
     public User getOwner() {
         return owner;
     }

@@ -48,7 +48,7 @@ public abstract class Repository<Key, Value extends Identifiable<Key>> implement
      *  @return the found entity */
     public Option<Value> findBy(Key id) {
         return withSessionDo(session ->
-            initializeAndUnproxy(session.getReference(type, id))
+                initializeAndUnproxy(session.getReference(type, id))
         ).toOption();
     }
 
@@ -61,10 +61,9 @@ public abstract class Repository<Key, Value extends Identifiable<Key>> implement
         return withTransactionSessionDo(session -> {
             session.persist(entity);
             return entity.getId();
-        })
-                .onFailure(ex ->
-                        logger.info(String.format("Couldn't create entity. Reason: %s", ex.getMessage()))
-                );
+        }).onFailure(ex ->
+                logger.info(String.format("Couldn't create entity. Reason: %s", ex.getMessage()))
+        );
     }
 
     /** Merges the given entity with its managed counterpart because we've been doing stuff hibernate shouldn't know about
@@ -73,16 +72,14 @@ public abstract class Repository<Key, Value extends Identifiable<Key>> implement
      *  @return if the merge was successful */
     public boolean update(Value entity) {
         return withTransactionSessionDo(session ->
-            Option.apply(session.find(type, entity.getId()))
-                    .map(ignored -> {
-                        session.merge(entity);
-                        return true;
-                    }).getOrElse(false)
-        )
-                .onFailure(ex ->
-                        logger.info(String.format("Couldn't update entity with id '%s', reason: %s", entity.getId(), ex.getMessage()))
-                )
-                .getOrElse(false);
+                Option.apply(session.find(type, entity.getId()))
+                        .map(ignored -> {
+                            session.merge(entity);
+                            return true;
+                        }).getOrElse(false)
+        ).onFailure(ex ->
+                logger.info(String.format("Couldn't update entity with id '%s', reason: %s", entity.getId(), ex.getMessage()))
+        ).getOrElse(false);
     }
 
     /** detach the entity (also known as deleting it to normal people)
@@ -95,11 +92,9 @@ public abstract class Repository<Key, Value extends Identifiable<Key>> implement
                             session.remove(entity);
                             return true;
                         }).getOrElse(false)
-        )
-                .onFailure(ex ->
-                        logger.info(String.format("Couldn't delete entity with id '%s', reason: %s", id, ex.getMessage()))
-                )
-                .getOrElse(false);
+        ).onFailure(ex ->
+                logger.info(String.format("Couldn't delete entity with id '%s', reason: %s", id, ex.getMessage()))
+        ).getOrElse(false);
     }
 
     /** make this usable with try with resources
@@ -120,6 +115,7 @@ public abstract class Repository<Key, Value extends Identifiable<Key>> implement
     private <A> Try<A> withTransactionSessionDo(Function<EntityManager, A> query) {
         int connectionId = ThreadLocalRandom.current().nextInt(1, 10);
         logger.info(String.format("Opening connection (%s) in transaction...", connectionId));
+
         return Try.apply(emf::createEntityManager)
                 .map(session -> {
                     try {

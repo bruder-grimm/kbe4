@@ -14,8 +14,8 @@ import static javax.persistence.GenerationType.IDENTITY;
 
 @Entity
 @Table(name = "playlists")
-@XmlRootElement
-@XmlAccessorType(XmlAccessType.FIELD)
+@XmlRootElement(name = "songList")
+@XmlAccessorType (XmlAccessType.FIELD)
 public class PlayList implements Identifiable<Integer> {
 
     @Id
@@ -25,7 +25,8 @@ public class PlayList implements Identifiable<Integer> {
 
     @JsonProperty("isPrivate")
     @XmlAttribute(name="isPrivate")
-    private boolean visible;
+    @Column(name="private")
+    private boolean invisible;
 
     @JsonIgnore
     @XmlTransient
@@ -33,6 +34,8 @@ public class PlayList implements Identifiable<Integer> {
     @JoinColumn(name = "owner_id", referencedColumnName = "userId")
     private User owner;
 
+    @JsonProperty("songs")
+    @XmlElement(name="song")
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "song_playlist",
@@ -66,12 +69,12 @@ public class PlayList implements Identifiable<Integer> {
         this.owner = owner;
     }
 
-    public boolean isVisible() {
-        return visible;
+    public boolean isInvisible() {
+        return invisible;
     }
 
-    public void setVisible(boolean visible) {
-        this.visible = visible;
+    public void setInvisible(boolean invisible) {
+        this.invisible = invisible;
     }
 
     public List<Song> getSongs() {
@@ -83,7 +86,7 @@ public class PlayList implements Identifiable<Integer> {
     }
 
     @Override public String toString() {
-        return String.format("PlayList(%s, %s, visible = %s, %s)", id, name, visible, songs);
+        return String.format("PlayList(%s, %s, private = %s, %s)", id, name, invisible, songs);
     }
 
     @Override public boolean equals(Object o) {
@@ -95,10 +98,10 @@ public class PlayList implements Identifiable<Integer> {
         return
                 id.equals(other.id) &&
                 name.equals(other.name) &&
-                visible == other.visible;
+                invisible == other.invisible;
     }
 
     @Override public int hashCode() {
-        return id + name.hashCode() + Boolean.hashCode(visible);
+        return id + name.hashCode() + Boolean.hashCode(invisible);
     }
 }

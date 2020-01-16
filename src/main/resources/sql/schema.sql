@@ -22,7 +22,7 @@ CREATE TABLE playlists(
     id SERIAL PRIMARY KEY NOT NULL,
     name VARCHAR(50) NOT NULL,
     owner_id VARCHAR(50) REFERENCES users (userId),
-    visible BOOLEAN
+    private BOOLEAN
 );
 
 CREATE TABLE song_playlist(

@@ -13,10 +13,10 @@ INSERT INTO songs (title, artist, label, released) VALUES ('Who Let the Dogs Out
 INSERT INTO songs (title, artist, label, released) VALUES ('My Humps', 'Black Eyed Peas', 'Universal Music', 2005);
 INSERT INTO songs (title, artist, label, released) VALUES ('Chinese Food', 'Alison Gold', 'PMW Live', 2013);
 
-INSERT INTO playlists (name, owner_id, visible) VALUES ('a', 'mmuster', true);
-INSERT INTO playlists (name, owner_id, visible) VALUES ('b', 'mmuster', false);
-INSERT INTO playlists (name, owner_id, visible) VALUES ('c', 'eschuler', true);
-INSERT INTO playlists (name, owner_id, visible) VALUES ('d', 'eschuler', false);
+INSERT INTO playlists (name, owner_id, private) VALUES ('a', 'mmuster', true);
+INSERT INTO playlists (name, owner_id, private) VALUES ('b', 'mmuster', false);
+INSERT INTO playlists (name, owner_id, private) VALUES ('c', 'eschuler', true);
+INSERT INTO playlists (name, owner_id, private) VALUES ('d', 'eschuler', false);
 
 INSERT INTO song_playlist (playlist_id, song_id) VALUES (1, 1);
 INSERT INTO song_playlist (playlist_id, song_id) VALUES (1, 3);

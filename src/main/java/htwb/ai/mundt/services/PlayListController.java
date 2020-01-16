@@ -46,7 +46,7 @@ public class PlayListController extends RestController {
 
                     List<PlayList> filtered = playListService.getAll().stream()
                             .filter(playList ->
-                                    (playList.isVisible() || visibleToUser) &&
+                                    (!playList.isInvisible() || visibleToUser) &&
                                     playList.getOwner().equals(requestedUser)
                             )
                             .collect(Collectors.toList());
@@ -72,7 +72,7 @@ public class PlayListController extends RestController {
                     logInfo(String.format("Found %s", playList));
 
                     User authenticatedUser = getUserFromContext(context);
-                    if (playList.isVisible() || playList.getOwner().equals(authenticatedUser)) {
+                    if (playList.isInvisible() || playList.getOwner().equals(authenticatedUser)) {
                         return Response.ok(playList);
                     } else return Response.status(FORBIDDEN);
                 })
@@ -89,7 +89,7 @@ public class PlayListController extends RestController {
         List<Option<Song>> possibleSongs = playlist.getSongs().stream()
                 .map(song -> songService.read(song.getId()))
                 .collect(Collectors.toList());
-
+        
         boolean anySongDoesntExist = possibleSongs.stream().anyMatch(Option::isEmpty);
 
         if (anySongDoesntExist) return Response.status(BAD_REQUEST).build();

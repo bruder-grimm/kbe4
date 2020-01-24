@@ -9,9 +9,9 @@
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
 
         <properties>
-            <property name="javax.persistence.jdbc.user" value="s0549272"/>
-            <property name="javax.persistence.jdbc.password" value="8.b.gSS1"/>
-            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://db.f4.htw-berlin.de:5432/_s0549272__songdb"/>
+            <property name="javax.persistence.jdbc.user" value=""/>
+            <property name="javax.persistence.jdbc.password" value=""/>
+            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/_s0549272__songdb"/>
             <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver"/>
 
             <!--Hibernate properties-->

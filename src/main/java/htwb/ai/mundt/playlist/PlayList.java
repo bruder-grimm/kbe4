@@ -9,6 +9,7 @@ import htwb.ai.mundt.user.User;
 import javax.persistence.*;
 import javax.xml.bind.annotation.*;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static javax.persistence.GenerationType.IDENTITY;
 

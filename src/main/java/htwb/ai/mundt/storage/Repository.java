@@ -48,7 +48,7 @@ public abstract class Repository<Key, Value extends Identifiable<Key>> implement
      *  @return the found entity */
     public Option<Value> findBy(Key id) {
         return withSessionDo(session ->
-                initializeAndUnproxy(session.getReference(type, id))
+                initializeAndUnproxy(session.find(type, id))
         ).toOption();
     }
 
@@ -60,6 +60,7 @@ public abstract class Repository<Key, Value extends Identifiable<Key>> implement
     public Try<Key> create(Value entity) {
         return withTransactionSessionDo(session -> {
             session.persist(entity);
+            session.detach(entity);
             return entity.getId();
         }).onFailure(ex ->
                 logger.info(String.format("Couldn't create entity. Reason: %s", ex.getMessage()))
@@ -67,16 +68,15 @@ public abstract class Repository<Key, Value extends Identifiable<Key>> implement
     }
 
     /** Merges the given entity with its managed counterpart because we've been doing stuff hibernate shouldn't know about
-     *  pssssst
      *  @param entity the entity
      *  @return if the merge was successful */
     public boolean update(Value entity) {
-        return withTransactionSessionDo(session ->
-                Option.apply(session.find(type, entity.getId()))
-                        .map(ignored -> {
-                            session.merge(entity);
-                            return true;
-                        }).getOrElse(false)
+        return withTransactionSessionDo(session -> {
+                    try {
+                        session.merge(entity);
+                        return true;
+                    } catch (IllegalArgumentException entityDoesntExist) { return false; }
+                }
         ).onFailure(ex ->
                 logger.info(String.format("Couldn't update entity with id '%s', reason: %s", entity.getId(), ex.getMessage()))
         ).getOrElse(false);

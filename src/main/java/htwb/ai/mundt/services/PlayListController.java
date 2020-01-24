@@ -89,7 +89,7 @@ public class PlayListController extends RestController {
         List<Option<Song>> possibleSongs = playlist.getSongs().stream()
                 .map(song -> songService.read(song.getId()))
                 .collect(Collectors.toList());
-        
+
         boolean anySongDoesntExist = possibleSongs.stream().anyMatch(Option::isEmpty);
 
         if (anySongDoesntExist) return Response.status(BAD_REQUEST).build();
